@@ -1,6 +1,7 @@
 <?php 
 
     /**
+     * @function createTextInput
      * Crea un form-group para un @string label, @string id, @string placeholder, @string smallHelper
      */
     function createTextInput($type, $label, $id, $placeholder, $required = true, $smallHelper = null){
@@ -18,6 +19,10 @@
         echo '</div>';
     }
 
+    /**
+     * @function createSelect
+     * 
+     */
     function createSelect($label, $id, $arr_data){
         echo '
             <div class="form-group">
@@ -32,6 +37,10 @@
         echo '</select></div>';
     }
 
+    /**
+     * @function createCheckBox
+     * 
+     */
     function createCheckBox($type, $label, $grupo, $arr_data){
         echo '
             <div class="form-group">
