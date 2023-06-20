@@ -27,6 +27,7 @@
      * Crea el voto en la base de datos
      */
     function toVote($data){
+        global $conn;
         global $patt5caracteres_an;
         global $pattEmail;
 
@@ -46,7 +47,11 @@
         }
 
         // Validar RUT
-        
+        $haVotado = haVotado(['rut' => $data['rut'], 'votacion_id' => $data['votacion_id']]);
+        if($haVotado[0] != 0){
+            $respuesta = false;
+            $respuesta_str[] = 'Este RUT ya ha votado.';
+        }
 
         // Validar Correo
         if(!preg_match($pattEmail, trim($data['alias']))){
@@ -56,7 +61,12 @@
 
         // Validar Región
         if($data['region'] != null && $data['region'] != 'null'){
-            
+            $sql = 'SELECT  id FROM regiones WHERE id = '.$data['region'];
+            $result = $conn->query($sql);
+            if($result->rowCount() == 0){
+                $respuesta = false;
+                $respuesta_str[] = 'No se encontró la región seleccionada.';
+            }
         }else{
             $respuesta = false;
             $respuesta_str[] = 'Debe seleccionar algún región.';
@@ -64,7 +74,12 @@
 
         // Validar Comuna
         if($data['comuna'] != null && $data['comuna'] != 'null'){
-
+            $sql = 'SELECT  id FROM comunas WHERE id = '.$data['comuna'];
+            $result = $conn->query($sql);
+            if($result->rowCount() == 0){
+                $respuesta = false;
+                $respuesta_str[] = 'No se encontró la comuna seleccionada.';
+            }
         }else{
             $respuesta = false;
             $respuesta_str[] = 'Debe seleccionar alguna comuna.';
@@ -72,7 +87,12 @@
 
         // Validar Candidato
         if($data['candidato'] != null && $data['candidato'] != 'null'){
-
+            $sql = 'SELECT  id FROM candidatos WHERE id = '.$data['candidato'];
+            $result = $conn->query($sql);
+            if($result->rowCount() == 0){
+                $respuesta = false;
+                $respuesta_str[] = 'No se encontró el candidato seleccionado.';
+            }
         }else{
             $respuesta = false;
             $respuesta_str[] = 'Debe seleccionar algún candidato.';
@@ -82,6 +102,16 @@
         if(count($data['how']) == 0){
             $respuesta = false;
             $respuesta_str[] = 'Debe seleccionar al menos 2 opciones en "Cómo se enteró de nosotros".';
+        }
+
+        if($respuesta){
+            $sql = 'INSERT INTO votos (usuario_rut, votacion_id, candidato_id) VALUES ("'.$data['rut'].'", "'.$data['votacion_id'].'", "'.$data['candidato'].'")';
+            if($conn->query($sql) == true){
+                $respuesta_str[] = 'Voto emitido.';
+            }else{
+                $respuesta = false;
+                $respuesta_str[] = 'Se produjo un error y no se pudo emitir el voto.';
+            } 
         }
 
         return array($respuesta);

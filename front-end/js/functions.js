@@ -140,7 +140,6 @@ async function haVotado(rut, votacion_id){
     return haVotado[0] == 0;
 }
 
-
 // Función que activará las notificaciones de error con su detalle
 function markAsInvalid(notifyId, text){
     let invalidFeedback = document.getElementById(notifyId+'-invalid-feedback');
