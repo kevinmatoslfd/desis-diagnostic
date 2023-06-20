@@ -16,7 +16,9 @@
         // Crea un small helper si corresponde
         if(!is_null($smallHelper)) echo '<small id="'.$id.'Help" class="form-text text-muted">'.$smallHelper.'</small>';
 
-        echo '</div>';
+        echo '
+            <div class="invalid-feedback" id="'.$id.'-invalid-feedback"></div>
+            </div>';
     }
 
     /**

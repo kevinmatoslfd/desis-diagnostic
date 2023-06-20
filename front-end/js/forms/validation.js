@@ -19,15 +19,35 @@ var Fn = {
 }
 
 // Valida si check group cumple con al menos @amount (número natural) selecciones
-function checkAtLeast(idCheckGroup, amount){
+function checkAtLeastCheckbox(checkboxName, amount){
     if(amount > 0){ // Amount positivo
-        //swal.fire("Debes seleccionar al menos "+amount+" opciones");
+		let checkboxMarcados = document.querySelectorAll('input[name="'+checkboxName+'"]:checked').length;
+        return checkboxMarcados >= amount;
     }
 }
 
-// Toma el RUT y lo transforma en un formato que validaRut pueda trabajarlo
-function rutValidation(){
-    let rut = $('#inputRut').val;
+// Valida si un input cumple con al menos @amount largo
+function checkAtLeastInput(inputId, amount){
+	if(amount >= 0){
+		return inputId.value.trim().length >= amount;
+    }else{ // Caso contrario es largo negativo
+		return -1;
+	}
+}
 
-    let res = Fn.validaRut(rut);
+// Toma el RUT y lo transforma en un formato que validaRut pueda trabajarlo (abcdefghi-j)
+function rutValidation(inputId){
+    let rut = document.getElementById(inputId).value.trim();
+	rut = rut.replace(' ', '').replace('.', '');
+
+    return Fn.validaRut(rut);
+}
+
+// Chequea si el valor seleccionado en un <select> es nulo
+function checkSelected(selectId){
+	if(selectId.value == 'null' || selectId.value == null){
+		return false;
+	}else{
+		return true;
+	}
 }

@@ -40,7 +40,7 @@
     function getCandidatos($data){
         global $conn;
 
-        $sql = 'SELECT id, candidato FROM candidatos';
+        $sql = 'SELECT candidatos.id AS id, candidatos.candidato as candidato FROM `votacion_candidato` LEFT JOIN candidatos ON votacion_candidato.candidato_id = candidatos.id WHERE votacion_candidato.votacion_id='.$data['votacion_id'];
         $result = $conn->query($sql);
         $res = $result->fetchAll(PDO::FETCH_ASSOC);
         $result->closeCursor();
