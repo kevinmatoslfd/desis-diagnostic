@@ -54,7 +54,7 @@
         }
 
         // Validar Correo
-        if(!preg_match($pattEmail, trim($data['alias']))){
+        if(!preg_match($pattEmail, trim($data['email']))){
             $respuesta = false;
             $respuesta_str[] = 'El correo es inválido.';
         }
@@ -69,7 +69,7 @@
             }
         }else{
             $respuesta = false;
-            $respuesta_str[] = 'Debe seleccionar algún región.';
+            $respuesta_str[] = 'Debe seleccionar alguna región.';
         }
 
         // Validar Comuna
@@ -99,22 +99,50 @@
         }
 
         // Validar count
-        if(count($data['how']) == 0){
+        if(!isset($data['how']) || $data['how'] == null || count($data['how']) == 0){
             $respuesta = false;
             $respuesta_str[] = 'Debe seleccionar al menos 2 opciones en "Cómo se enteró de nosotros".';
         }
 
         if($respuesta){
-            $sql = 'INSERT INTO votos (usuario_rut, votacion_id, candidato_id) VALUES ("'.$data['rut'].'", "'.$data['votacion_id'].'", "'.$data['candidato'].'")';
-            if($conn->query($sql) == true){
-                $respuesta_str[] = 'Voto emitido.';
+            $usuarioCreado = false;
+            $usuarioExiste = false;
+
+            $sql = 'SELECT id FROM usuarios WHERE rut = "'.$data['rut'].'"';
+            $result = $conn->query($sql);
+            if($result->rowCount() == 0){
+                $sql = 'INSERT INTO usuarios (nombre_apellido, alias, rut, email) VALUES("'.$data['nombreApellido'].'", "'.$data['alias'].'", "'.$data['rut'].'", "'.$data['email'].'")';
+                if($conn->query($sql) == true){ // Usuario creado
+                    $usuarioCreado = true;
+                }
+            }else{
+                $usuarioExiste = true;
+                $sql = 'UPDATE usuarios SET nombre_apellido = "'.$data['nombreApellido'].'", alias = "'.$data['alias'].'", email = "'.$data['email'].'" WHERE rut = "'.$data['rut'].'"';
+                if($conn->query($sql) == false){
+                    // Fallo al actualizar.
+                    // $respuesta_str[] = 'Se produjo un error al actualizar sus datos.';
+                }
+            }
+
+            if($usuarioExiste || $usuarioCreado){
+                $sql = 'INSERT INTO votos (usuario_rut, votacion_id, candidato_id) VALUES ("'.$data['rut'].'", '.$data['votacion_id'].', '.$data['candidato'].')';
+                if($conn->query($sql) == true){
+                    $respuesta = true;
+                    $respuesta_str[] = 'Voto emitido.';
+                }else{
+                    $respuesta = false;
+                    $respuesta_str[] = 'Se produjo un error y no se pudo emitir el voto.';
+                } 
             }else{
                 $respuesta = false;
-                $respuesta_str[] = 'Se produjo un error y no se pudo emitir el voto.';
-            } 
-        }
+                $respuesta_str[] = 'Se produjo un error y no se pudo emitir el voto.'; 
+            }
+        }else{
+            $respuesta = false;
+            $respuesta_str[] = 'Se produjo un error y no se pudo emitir el voto.';
+        } 
 
-        return array($respuesta);
+        return array($respuesta, $respuesta_str);
     }
 
     // Según la function parámetro se decide qué función asignar

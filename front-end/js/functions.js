@@ -268,9 +268,6 @@ async function enviarVoto(e){
         markAsInvalid(inputHowId, 'Debe elegir al menos 2 opciones.');
     }
 
-    // Habilitamos el botón para votar
-    document.getElementById("votarFormSubmit").disabled = false;
-
     if(submit){
         var arrayCheckbox = []
         var checkboxes = document.querySelectorAll('input[name="checkHow"]:checked')
@@ -279,18 +276,22 @@ async function enviarVoto(e){
             arrayCheckbox.push(checkboxes[i].value)
         }
 
-        let res = toVote(votacion_id, inputNombreApellido, inputAlias, inputRut, inputEmail, regionSelect, comunaSelect, candidatoSelect, arrayCheckbox);
+        let res = await toVote(votacion_id, inputNombreApellido, inputAlias, inputRut, inputEmail, regionSelect, comunaSelect, candidatoSelect, arrayCheckbox);
         if(res[0]){
             Swal.fire({
                 icon: 'success',
                 title: 'Voto Emitido',
-                text: 'Serás redirigido a otra página.',
+                //text: 'Serás redirigido a otra página.',
             });
         }else{
+            let msgError = '';
+            res[1].forEach(item => {
+                msgError += item + ' ';
+            })
             Swal.fire({
                 icon: 'error',
                 title: 'Se produjo un error al momento de votar',
-                text: res[1],
+                text: msgError,
             });
         }
     }else{
@@ -300,4 +301,7 @@ async function enviarVoto(e){
             text: 'Se encontraron inconsistencias en el formulario.',
         });
     }
+
+    // Habilitamos el botón para votar
+    document.getElementById("votarFormSubmit").disabled = false;
 }
